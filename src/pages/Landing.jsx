@@ -3,8 +3,10 @@ import { Link } from 'react-router-dom';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { useStore } from '../lib/store';
+import { config } from '../lib/config';
 import { fmtRp } from '../lib/utils';
 import Chatbot from '../components/Chatbot';
+import ThemeToggle from '../components/ThemeToggle';
 import { Brand } from '../components/Layout';
 
 gsap.registerPlugin(ScrollTrigger);
@@ -142,6 +144,7 @@ export default function Landing() {
             ))}
           </nav>
           <div className="flex items-center gap-3">
+            <ThemeToggle />
             <Link to="/login" className="micro hidden transition hover:!text-lime sm:block">
               Login
             </Link>
@@ -156,49 +159,50 @@ export default function Landing() {
       </header>
 
       {/* Hero */}
-      <section className="mx-auto grid max-w-7xl items-center gap-10 px-6 py-16 lg:grid-cols-2 lg:py-24">
+      <section className="mx-auto grid min-h-[calc(100vh-81px)] max-w-7xl items-center gap-12 px-6 py-16 lg:grid-cols-[1.1fr_1fr] lg:gap-10 lg:py-20">
         <div>
-          <p data-hero-eyebrow className="micro !text-lime">
+          <p data-hero-eyebrow className="micro flex items-center gap-3 !text-lime">
+            <span className="h-px w-10 bg-lime" />
             Gopa Gym — Premium Fitness Club
           </p>
-          <h1 className="mt-5 font-display text-6xl uppercase leading-[0.92] md:text-8xl">
-            <span className="block overflow-hidden pb-2">
-              <span data-hero-word className="inline-block">
-                Speak <span className="text-lime">fitness</span>
+          <h1 className="mt-6 font-display text-[64px] uppercase leading-[0.86] md:text-[88px] xl:text-[112px]">
+            {['Speak', 'Fitness', 'With your', 'Work'].map((word) => (
+              <span key={word} className="block overflow-hidden">
+                <span data-hero-word className="inline-block">
+                  {word === 'Fitness' ? <span className="text-outline">{word}</span> : word}
+                </span>
               </span>
-            </span>
-            <span className="block overflow-hidden pb-2">
-              <span data-hero-word className="inline-block">
-                with your work
-              </span>
-            </span>
+            ))}
           </h1>
           <div data-hero-fade className="mt-8 flex flex-wrap gap-3">
             <a
               href="#membership"
-              className="inline-flex h-12 items-center rounded-full bg-lime px-7 text-sm font-semibold uppercase tracking-wider text-ink transition hover:-translate-y-0.5 hover:bg-limeBright"
+              className="inline-flex h-12 items-center rounded-full bg-lime px-7 font-condensed text-[15px] font-bold uppercase tracking-[0.09em] text-ink transition hover:-translate-y-0.5 hover:bg-limeBright"
             >
               Join now
             </a>
             <a
               href="#commitment"
-              className="inline-flex h-12 items-center rounded-full border border-border bg-secondary px-7 text-sm font-semibold uppercase tracking-wider text-text transition hover:-translate-y-0.5 hover:border-lime/40"
+              className="inline-flex h-12 items-center rounded-full border border-border bg-secondary px-7 font-condensed text-[15px] font-bold uppercase tracking-[0.09em] text-text transition hover:-translate-y-0.5 hover:border-lime/40"
             >
               Learn more
             </a>
           </div>
+          <p data-hero-fade className="mt-6 max-w-md text-base leading-relaxed text-muted">
+            Kelas, pelatih, dan alat terbaik untuk membangun kebiasaan sehat Anda setiap hari.
+          </p>
           <p data-hero-fade className="mt-4 text-sm text-muted">
             No joining fee · Cancel anytime
           </p>
 
-          <div data-hero-fade className="mt-12 grid grid-cols-3 gap-4 border-t border-border pt-8">
+          <div data-hero-fade className="mt-14 grid grid-cols-3 gap-6 border-t border-border pt-8">
             {[
               ['200', '+', 'Expert trainers'],
               ['24/7', '', 'Classes weekly'],
               ['118', '+', 'Equipment'],
             ].map(([value, suffix, label]) => (
               <div key={label}>
-                <p className="font-display text-4xl text-lime" data-count={/^\d+$/.test(value) ? value : undefined} data-suffix={suffix}>
+                <p className="font-display text-[56px] leading-none text-lime" data-count={/^\d+$/.test(value) ? value : undefined} data-suffix={suffix}>
                   {value}
                   {suffix}
                 </p>
@@ -209,6 +213,15 @@ export default function Landing() {
         </div>
 
         <div data-hero-img className="relative">
+          <div className="absolute -left-6 bottom-12 z-10 flex items-center gap-4 rounded-2xl border border-border bg-card/95 px-5 py-4 shadow-2xl backdrop-blur">
+            <span className="flex h-11 w-11 items-center justify-center rounded-full bg-lime font-display text-lg text-ink">
+              ✓
+            </span>
+            <div>
+              <p className="font-display text-3xl leading-none text-text">4.9K+</p>
+              <p className="micro mt-1 text-[10px]">Active members</p>
+            </div>
+          </div>
           <div className="absolute inset-0 translate-x-4 translate-y-4 rounded-3xl bg-lime" />
           <div className="relative overflow-hidden rounded-3xl">
             <img
@@ -223,7 +236,7 @@ export default function Landing() {
 
       {/* Marquee */}
       <div className="overflow-hidden bg-lime py-4">
-        <div data-marquee className="flex w-max whitespace-nowrap font-condensed text-lg font-semibold uppercase tracking-wider text-ink">
+        <div data-marquee className="flex w-max whitespace-nowrap font-serif text-xl italic text-ink">
           {[...MARQUEE, ...MARQUEE, ...MARQUEE, ...MARQUEE].map((item, i) => (
             <span key={i} className="px-8">
               {item} ✦
@@ -235,7 +248,7 @@ export default function Landing() {
       {/* Commitment */}
       <section id="commitment" className="mx-auto max-w-7xl px-6 py-24">
         <Eyebrow>Our commitment · 02</Eyebrow>
-        <h2 data-reveal className="mt-4 font-display text-6xl uppercase leading-none md:text-7xl">
+        <h2 data-reveal className="mt-4 font-display text-[44px] uppercase sm:text-section-xl">
           Our commitment to your fitness
         </h2>
         <p data-reveal className="mt-6 max-w-2xl text-muted">
@@ -245,19 +258,19 @@ export default function Landing() {
 
         <div data-reveal-group className="mt-12 grid gap-4 md:grid-cols-3">
           <div className="rounded-2xl border border-border bg-card p-8 transition duration-300 hover:-translate-y-1 hover:border-lime/40">
-            <p className="font-display text-3xl uppercase">The gym Gopa experience in your city</p>
+            <p className="font-condensed text-pillar-title font-bold uppercase">The gym Gopa experience in your city</p>
             <p className="mt-4 text-sm text-muted">
               One membership, one standard. Expert coaching and equipment that is actually maintained.
             </p>
           </div>
           <div className="rounded-2xl border border-border bg-card p-8 transition duration-300 hover:-translate-y-1 hover:border-lime/40">
-            <p className="font-display text-3xl uppercase">Dedicated to your fitness success</p>
+            <p className="font-condensed text-pillar-title font-bold uppercase">Dedicated to your fitness success</p>
             <p className="mt-4 text-sm text-muted">
               Clear plans, honest progress tracking and a floor team that knows your name.
             </p>
           </div>
           <div className="flex flex-col justify-between rounded-2xl bg-lime p-8 text-ink transition duration-300 hover:-translate-y-1">
-            <p className="font-display text-3xl uppercase leading-tight">The best gym equipment in your city</p>
+            <p className="font-condensed text-[28px] font-bold uppercase leading-[30px]">The best gym equipment in your city</p>
             <p className="mt-8 text-xs font-semibold uppercase tracking-wider">42 stations · free weights · cardio</p>
           </div>
         </div>
@@ -287,7 +300,7 @@ export default function Landing() {
             ['800', '+', 'Certified trainers', 'Across the network', 'bg-lime text-ink'],
           ].map(([value, suffix, label, sub, cls]) => (
             <div key={label} className={`rounded-2xl p-8 transition duration-300 hover:-translate-y-1 ${cls}`}>
-              <p className="font-display text-7xl leading-none" data-count={value} data-suffix={suffix}>
+              <p className="font-display text-stat-lg" data-count={value} data-suffix={suffix}>
                 0{suffix}
               </p>
               <p className="mt-4 text-xs font-semibold uppercase tracking-wider">{label}</p>
@@ -300,7 +313,7 @@ export default function Landing() {
       {/* Membership */}
       <section id="membership" className="mx-auto max-w-7xl px-6 pb-24">
         <Eyebrow>Membership · 04</Eyebrow>
-        <h2 data-reveal className="mt-4 font-display text-6xl uppercase leading-none md:text-7xl">
+        <h2 data-reveal className="mt-4 font-display text-[40px] uppercase sm:text-section-lg">
           Enjoy exclusive benefits
         </h2>
         <p data-reveal className="mt-4 text-muted">
@@ -317,8 +330,8 @@ export default function Landing() {
                   featured ? 'border-lime bg-lime text-ink' : 'border-border bg-card hover:border-lime/40'
                 }`}
               >
-                <p className="font-display text-3xl uppercase">{p.name} membership</p>
-                <p className={`mt-6 font-display text-6xl leading-none ${featured ? 'text-ink' : 'text-lime'}`}>{fmtRp(p.price)}</p>
+                <p className="font-condensed text-pkg-title font-bold uppercase">{p.name} membership</p>
+                <p className={`mt-6 font-display text-price ${featured ? 'text-ink' : 'text-lime'}`}>{fmtRp(p.price)}</p>
                 <p className={`mt-4 text-xs uppercase tracking-wider ${featured ? 'text-ink/70' : 'text-muted'}`}>
                   / {p.durationDays} hari
                 </p>
@@ -332,8 +345,8 @@ export default function Landing() {
                 </ul>
                 <Link
                   to="/login"
-                  className={`mt-8 inline-flex h-12 items-center justify-center rounded-full text-sm font-semibold uppercase tracking-wider transition hover:-translate-y-0.5 ${
-                    featured ? 'bg-ink text-lime' : 'bg-lime text-ink hover:bg-limeBright'
+                  className={`mt-8 inline-flex h-12 items-center justify-center rounded-full font-condensed text-[15px] font-bold uppercase tracking-[0.09em] transition hover:-translate-y-0.5 ${
+                    featured ? 'bg-ink text-[#A5E900]' : 'bg-lime text-ink hover:bg-limeBright'
                   }`}
                 >
                   Join now →
@@ -348,7 +361,7 @@ export default function Landing() {
       <section id="facilities" className="mx-auto max-w-7xl px-6 pb-24">
         <Eyebrow>Facilities · 05</Eyebrow>
         <div className="mt-4 flex flex-wrap items-end justify-between gap-6">
-          <h2 data-reveal className="font-display text-6xl uppercase leading-none md:text-7xl">
+          <h2 data-reveal className="font-display text-[40px] uppercase sm:text-section-lg">
             Modern equipment for every workout
           </h2>
           <p data-reveal className="max-w-sm text-muted">
@@ -375,7 +388,7 @@ export default function Landing() {
         <div className="relative mx-auto max-w-7xl px-6 py-24">
           <div data-reveal className="max-w-xl rounded-2xl bg-lime p-10 text-ink">
             <p className="micro !text-ink/60">Ready when you are</p>
-            <h2 className="mt-3 font-display text-5xl uppercase leading-none">Join our fitness community</h2>
+            <h2 className="mt-3 font-display text-[40px] uppercase leading-[42px] sm:text-cta-title">Join our fitness community</h2>
             <p className="mt-4 text-sm">
               Start with a free assessment, meet the coaches and train on a plan built around your week.
             </p>
@@ -386,7 +399,7 @@ export default function Landing() {
                 ['20', 'K+', 'Community'],
               ].map(([value, suffix, label]) => (
                 <div key={label}>
-                  <p className="font-display text-3xl">
+                  <p className="font-display text-stat-md">
                     {value}
                     {suffix}
                   </p>
@@ -401,7 +414,9 @@ export default function Landing() {
       <footer id="footer" className="border-t border-border bg-base px-6 py-10">
         <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-6">
           <Brand />
-          <p className="text-sm text-muted">Jl. Bypass Ngurah Rai No.88, Karangasem · hello@gopagym.id · +62 812 3456 7890</p>
+          <p className="text-sm text-muted">
+            {config.gym.address} · {config.gym.email} · {config.gym.phone}
+          </p>
           <p className="text-xs text-muted">© 2026 Gopa Gym. All rights reserved.</p>
         </div>
       </footer>

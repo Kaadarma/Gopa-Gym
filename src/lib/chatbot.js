@@ -1,4 +1,5 @@
 // Chatbot berbasis aturan (keyword). Pertanyaan di luar cakupan dijawab dengan fallback.
+import { config } from './config';
 const INTENTS = [
   {
     keys: ['halo', 'hai', 'selamat', 'pagi', 'siang', 'malam'],
@@ -11,7 +12,7 @@ const INTENTS = [
   },
   {
     keys: ['jam', 'buka', 'tutup', 'operasional'],
-    reply: 'Gopa Gym buka setiap hari pukul 06.00 - 22.00 WIB.',
+    reply: `${config.appName} buka setiap hari pukul ${config.gym.hours}.`,
   },
   {
     keys: ['harga', 'paket', 'biaya', 'tarif', 'membership'],

@@ -1,6 +1,6 @@
 import { useStore } from '../../lib/store';
 import { addDays, fmtRp, today } from '../../lib/utils';
-import { Card, PageHeader, Stat } from '../../components/ui';
+import { Card, Stat } from '../../components/ui';
 
 export default function Analytics() {
   const { data } = useStore();
@@ -51,8 +51,6 @@ export default function Analytics() {
 
   return (
     <>
-      <PageHeader title="Analytics" subtitle="Ringkasan pendapatan, keanggotaan, dan kunjungan untuk Owner." />
-
       <div className="grid gap-4 md:grid-cols-3">
         <Stat label="Pendapatan tahun ini" value={fmtRp(revenueThisYear)} />
         <Stat label="Tingkat perpanjangan" value={`${renewalRate}%`} hint={`${renewed} dari ${withAny} anggota`} />
@@ -83,7 +81,7 @@ export default function Analytics() {
               <div key={d.date} className="flex h-full flex-1 flex-col justify-end gap-2">
                 <p className="text-center text-[11px] text-muted">{d.value}</p>
                 <div
-                  className={`rounded-t-md ${d.date === t ? 'bg-lime' : 'bg-white/15'}`}
+                  className={`rounded-t-md ${d.date === t ? 'bg-lime' : 'bg-dim/15'}`}
                   style={{ height: `${(d.value / maxCheckin) * 100}%`, minHeight: d.value ? 4 : 0 }}
                 />
                 <p className="text-center text-xs text-muted">{d.label}</p>
@@ -98,14 +96,14 @@ export default function Analytics() {
             {[
               ['Aktif', statusCount.active, 'bg-lime'],
               ['Kedaluwarsa', statusCount.expired, 'bg-muted/60'],
-              ['Belum ada membership', statusCount.none, 'bg-white/20'],
+              ['Belum ada membership', statusCount.none, 'bg-dim/20'],
             ].map(([label, n, color]) => (
               <div key={label}>
                 <div className="flex justify-between text-sm">
                   <span>{label}</span>
                   <span className="text-muted">{n}</span>
                 </div>
-                <div className="mt-2 h-2 rounded-full bg-white/5">
+                <div className="mt-2 h-2 rounded-full bg-dim/5">
                   <div className={`h-full rounded-full ${color}`} style={{ width: `${(n / totalMembers) * 100}%` }} />
                 </div>
               </div>

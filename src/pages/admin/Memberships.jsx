@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useStore } from '../../lib/store';
 import { fmtDate, today } from '../../lib/utils';
-import { Badge, Button, Card, Field, Notice, PageHeader, TD, TH, inputCls } from '../../components/ui';
+import { Badge, Button, Card, Field, Notice, TD, TH, inputCls } from '../../components/ui';
 
 const METHODS = ['Tunai', 'Transfer', 'QRIS', 'Debit'];
 
@@ -58,8 +58,6 @@ export default function Memberships() {
 
   return (
     <>
-      <PageHeader title="Memberships" subtitle="Aktivasi dan perpanjangan membership beserta riwayatnya." />
-
       <div className="grid gap-4 lg:grid-cols-5">
         <Card className="lg:col-span-2">
           <p className="micro">Aktivasi / perpanjangan</p>

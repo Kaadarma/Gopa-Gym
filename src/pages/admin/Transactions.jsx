@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useStore } from '../../lib/store';
 import { fmtDate, fmtRp, today } from '../../lib/utils';
-import { Button, Card, Field, PageHeader, TD, TH, inputCls } from '../../components/ui';
+import { Button, Card, Field, TD, TH, inputCls } from '../../components/ui';
 
 const METHODS = ['Tunai', 'Transfer', 'QRIS', 'Debit'];
 const EMPTY = { memberId: '', amount: '', method: 'Tunai', date: today(), note: '' };
@@ -45,8 +45,6 @@ export default function Transactions() {
 
   return (
     <>
-      <PageHeader title="Transactions" subtitle="Catat nominal, metode, dan riwayat pembayaran anggota." />
-
       <div className="grid gap-4 lg:grid-cols-5">
         <Card className="lg:col-span-2">
           <p className="micro">Transaksi baru</p>

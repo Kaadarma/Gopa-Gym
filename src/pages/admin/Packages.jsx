@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useStore } from '../../lib/store';
 import { fmtRp } from '../../lib/utils';
-import { Button, Card, Field, Modal, PageHeader, TD, TH, inputCls } from '../../components/ui';
+import { Button, Card, Field, Modal, TD, TH, inputCls } from '../../components/ui';
 
 const EMPTY = { name: '', price: '', durationDays: '' };
 
@@ -57,11 +57,9 @@ export default function Packages() {
 
   return (
     <>
-      <PageHeader
-        title="Packages"
-        subtitle="Nama paket, harga, dan durasi membership."
-        action={<Button onClick={openNew}>+ Paket baru</Button>}
-      />
+      <div className="mb-4 flex justify-end">
+        <Button onClick={openNew}>+ Paket baru</Button>
+      </div>
 
       <Card className="overflow-hidden p-0">
         <table className="w-full">

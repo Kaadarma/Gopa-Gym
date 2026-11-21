@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useStore } from '../../lib/store';
 import { fmtDate } from '../../lib/utils';
-import { Avatar, Card, PageHeader, TD, TH, inputCls } from '../../components/ui';
+import { Avatar, Card, TD, TH, inputCls } from '../../components/ui';
 
 export default function Attendance() {
   const { data } = useStore();
@@ -15,8 +15,6 @@ export default function Attendance() {
 
   return (
     <>
-      <PageHeader title="Attendance" subtitle="Riwayat check-in anggota berdasarkan tanggal dan waktu." />
-
       <div className="mb-4 flex flex-wrap gap-3">
         <input type="date" className={`${inputCls} w-auto`} value={date} onChange={(e) => setDate(e.target.value)} />
         <select className={`${inputCls} w-auto`} value={memberId} onChange={(e) => setMemberId(e.target.value)}>

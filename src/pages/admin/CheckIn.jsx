@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useStore } from '../../lib/store';
 import { fmtDate, today } from '../../lib/utils';
-import { Avatar, Button, Card, Field, Notice, PageHeader, TD, TH, inputCls } from '../../components/ui';
+import { Avatar, Button, Card, Field, Notice, TD, TH, inputCls } from '../../components/ui';
 
 export default function CheckIn() {
   const { data, checkIn } = useStore();
@@ -27,8 +27,6 @@ export default function CheckIn() {
 
   return (
     <>
-      <PageHeader title="QR Check-in" subtitle="Pindai barcode anggota atau pilih manual jika barcode tidak terbaca." />
-
       <div className="grid gap-4 lg:grid-cols-5">
         <Card className="space-y-6 lg:col-span-2">
           <form

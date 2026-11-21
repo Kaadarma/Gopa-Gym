@@ -3,6 +3,8 @@ import { Navigate } from 'react-router-dom';
 import { homeFor, useStore } from '../lib/store';
 import { Brand } from '../components/Layout';
 import { Button, Card, Field, Notice, inputCls } from '../components/ui';
+import { config } from '../lib/config';
+import ThemeToggle from '../components/ThemeToggle';
 
 const DEMO = [
   ['Admin', 'admin@gopagym.id', 'admin123'],
@@ -30,7 +32,10 @@ export default function Login() {
   return (
     <div className="grid min-h-screen lg:grid-cols-2">
       <section className="flex flex-col justify-between p-10 lg:p-16">
-        <Brand />
+        <div className="flex items-center justify-between">
+          <Brand />
+          <ThemeToggle />
+        </div>
         <div className="mt-16 lg:mt-0">
           <h1 className="font-display text-7xl uppercase leading-[0.95] text-text">
             Speak fitness
@@ -75,16 +80,18 @@ export default function Login() {
             </Button>
           </form>
 
-          <div className="mt-8 border-t border-border pt-5">
-            <p className="micro mb-3">Akun demo</p>
-            <ul className="space-y-2 text-xs text-muted">
-              {DEMO.map(([role, email, pass]) => (
-                <li key={role}>
-                  <span className="text-text">{role}:</span> {email} / {pass}
-                </li>
-              ))}
-            </ul>
-          </div>
+          {config.showDemoAccounts && (
+            <div className="mt-8 border-t border-border pt-5">
+              <p className="micro mb-3">Akun demo</p>
+              <ul className="space-y-2 text-xs text-muted">
+                {DEMO.map(([role, email, pass]) => (
+                  <li key={role}>
+                    <span className="text-text">{role}:</span> {email} / {pass}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
         </Card>
       </section>
     </div>

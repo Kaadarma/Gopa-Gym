@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { PAGE_KEYS, useStore } from '../../lib/store';
-import { Button, Card, Notice, PageHeader, TD, TH } from '../../components/ui';
+import { Button, Card, Notice, TD, TH } from '../../components/ui';
 
 const LABELS = {
   dashboard: 'Dashboard',
@@ -27,20 +27,16 @@ export default function Access() {
 
   return (
     <>
-      <PageHeader
-        title="Settings"
-        subtitle="Atur hak akses halaman untuk peran Admin. Owner selalu memiliki akses penuh."
-        action={
-          <Button
-            onClick={() => {
-              setAdminPermissions(pages);
-              setSaved(true);
-            }}
-          >
-            Simpan hak akses
-          </Button>
-        }
-      />
+      <div className="mb-4 flex justify-end">
+        <Button
+          onClick={() => {
+            setAdminPermissions(pages);
+            setSaved(true);
+          }}
+        >
+          Simpan hak akses
+        </Button>
+      </div>
 
       {saved && (
         <div className="mb-4">

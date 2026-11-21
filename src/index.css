@@ -2,17 +2,83 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Warna tema. Nilai RGB dipakai Tailwind lewat rgb(var(--x) / <alpha-value>). */
+:root,
+:root[data-theme='dark'] {
+  --base: 8 10 7;
+  --secondary: 17 20 13;
+  --card: 23 27 18;
+  --text: 245 245 240;
+  --muted: 164 166 156;
+  --lime: 165 233 0;
+  --lime-bright: 182 245 27;
+  --pending: 233 162 59;
+  --danger: 229 83 61;
+  --border: rgba(255, 255, 255, 0.12);
+  --lime-text: #a5e900;
+  --dim: 255 255 255;
+  /* Warna khusus layar admin di figcraft. */
+  --faint: 110 114 104;
+  --panel: 11 13 9;
+  --chip: 30 36 23;
+  --bar: 35 43 28;
+  --mix-2: 141 160 90;
+  --mix-3: 58 66 46;
+  --hairline: rgba(255, 255, 255, 0.06);
+  --line: rgba(255, 255, 255, 0.08);
+  --line-strong: rgba(255, 255, 255, 0.12);
+  color-scheme: dark;
+}
+
+:root[data-theme='light'] {
+  --base: 245 245 240;
+  --secondary: 234 234 227;
+  --card: 255 255 255;
+  --text: 10 12 6;
+  --muted: 94 97 86;
+  --lime: 165 233 0;
+  --lime-bright: 182 245 27;
+  --pending: 196 124 20;
+  --danger: 205 60 40;
+  --border: rgba(10, 12, 6, 0.12);
+  --lime-text: #4d7a00;
+  --dim: 10 12 6;
+  --faint: 122 125 114;
+  --panel: 236 236 229;
+  --chip: 231 232 222;
+  --bar: 219 223 205;
+  --mix-2: 141 160 90;
+  --mix-3: 195 204 175;
+  --hairline: rgba(10, 12, 6, 0.1);
+  --line: rgba(10, 12, 6, 0.14);
+  --line-strong: rgba(10, 12, 6, 0.2);
+  color-scheme: light;
+}
+
 @layer base {
-  html {
-    color-scheme: dark;
+  body {
+    transition: background-color 0.3s ease, color 0.3s ease;
   }
   select option {
-    background: #11140d;
+    background: rgb(var(--secondary));
+    color: rgb(var(--text));
   }
+}
+
+/* Di light mode, teks lime terlalu pucat di atas latar terang. Dipakai warna hijau yang lebih gelap. */
+:root[data-theme='light'] .text-lime,
+:root[data-theme='light'] .\!text-lime,
+:root[data-theme='light'] .hover\:\!text-lime:hover {
+  color: var(--lime-text);
 }
 
 @layer components {
   .micro {
-    @apply text-[11px] font-semibold uppercase tracking-[0.18em] text-muted;
+    @apply font-sans text-[10px] font-semibold uppercase tracking-[2px] text-muted;
+  }
+  /* Teks outline seperti "FITNESS" di figcraft: isi transparan, garis 2.2px */
+  .text-outline {
+    color: transparent;
+    -webkit-text-stroke: 2.2px rgb(var(--text));
   }
 }

@@ -1,19 +1,48 @@
-import { NavLink, Outlet, useNavigate } from 'react-router-dom';
+import { useEffect, useState } from 'react';
+import { NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { useStore } from '../lib/store';
 import Chatbot from './Chatbot';
+import ThemeToggle from './ThemeToggle';
 import { Button } from './ui';
+import {
+  IconAnalytics,
+  IconAttendance,
+  IconBell,
+  IconDashboard,
+  IconLogout,
+  IconMembers,
+  IconMemberships,
+  IconPackages,
+  IconQr,
+  IconSearch,
+  IconSettings,
+  IconTransactions,
+} from './icons';
 
+// Urutan, label, ikon, dan badge mengikuti sidebar di gopa-gym.figcraft (Admin Dashboard).
 const ADMIN_NAV = [
-  ['dashboard', 'Dashboard', '/admin'],
-  ['members', 'Members', '/admin/members'],
-  ['packages', 'Packages', '/admin/packages'],
-  ['memberships', 'Memberships', '/admin/memberships'],
-  ['checkin', 'QR Check-in', '/admin/checkin'],
-  ['attendance', 'Attendance', '/admin/attendance'],
-  ['transactions', 'Transactions', '/admin/transactions'],
-  ['analytics', 'Analytics', '/admin/analytics'],
-  ['access', 'Settings', '/admin/access'],
+  { key: 'dashboard', label: 'Dashboard', to: '/admin', icon: IconDashboard, section: 'Overview' },
+  { key: 'members', label: 'Members', to: '/admin/members', icon: IconMembers, count: true },
+  { key: 'memberships', label: 'Memberships', to: '/admin/memberships', icon: IconMemberships },
+  { key: 'packages', label: 'Packages', to: '/admin/packages', icon: IconPackages },
+  { key: 'checkin', label: 'QR Check-in', to: '/admin/checkin', icon: IconQr, section: 'Operations', live: true },
+  { key: 'attendance', label: 'Attendance', to: '/admin/attendance', icon: IconAttendance },
+  { key: 'transactions', label: 'Transactions', to: '/admin/transactions', icon: IconTransactions },
+  { key: 'analytics', label: 'Analytics', to: '/admin/analytics', icon: IconAnalytics, section: 'Insights' },
+  { key: 'access', label: 'Settings', to: '/admin/access', icon: IconSettings },
 ];
+
+const ADMIN_TITLES = {
+  '/admin': 'Dashboard',
+  '/admin/members': 'Members',
+  '/admin/memberships': 'Memberships',
+  '/admin/packages': 'Packages',
+  '/admin/checkin': 'QR Check-in',
+  '/admin/attendance': 'Attendance',
+  '/admin/transactions': 'Transactions',
+  '/admin/analytics': 'Analytics',
+  '/admin/access': 'Settings',
+};
 
 const linkCls = ({ isActive }) =>
   `flex items-center rounded-xl px-4 py-2.5 text-sm font-medium transition ${
@@ -31,40 +60,184 @@ export function Brand() {
   );
 }
 
+// "Monday, 16 November 2026  ·  08:42 WIB" seperti di topbar figcraft.
+function useClockLine() {
+  const [line, setLine] = useState('');
+  useEffect(() => {
+    const tick = () => {
+      const now = new Date();
+      const day = now.toLocaleDateString('en-GB', {
+        weekday: 'long',
+        day: 'numeric',
+        month: 'long',
+        year: 'numeric',
+      });
+      const time = now.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
+      setLine(`${day}  ·  ${time} WIB`);
+    };
+    tick();
+    const id = setInterval(tick, 30000);
+    return () => clearInterval(id);
+  }, []);
+  return line;
+}
+
+function Initials({ name = '', className = '' }) {
+  const letters = name
+    .split(' ')
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((w) => w[0])
+    .join('')
+    .toUpperCase();
+  return (
+    <span
+      className={`flex shrink-0 items-center justify-center rounded-full bg-chip font-semibold text-text ${className}`}
+    >
+      {letters}
+    </span>
+  );
+}
+
+function SidebarLink({ item, count }) {
+  const Icon = item.icon;
+  return (
+    <NavLink
+      to={item.to}
+      end={item.to === '/admin'}
+      className={({ isActive }) =>
+        `relative flex h-10 items-center gap-[11px] rounded-lg pl-[13px] pr-3 text-[11.5px] font-medium transition ${
+          isActive ? 'bg-lime/[0.078] text-lime' : 'text-muted hover:text-text'
+        }`
+      }
+    >
+      {({ isActive }) => (
+        <>
+          {isActive && <span className="absolute left-0 top-1/2 h-5 w-[3px] -translate-y-1/2 bg-lime" />}
+          <Icon className={isActive ? 'text-lime' : 'text-muted'} />
+          <span className="truncate">{item.label}</span>
+          {item.count && <span className="ml-auto text-[8px] font-medium text-faint">{count}</span>}
+          {item.live && (
+            <span className="ml-auto text-[7px] font-semibold uppercase tracking-[1px] text-lime">Live</span>
+          )}
+        </>
+      )}
+    </NavLink>
+  );
+}
+
 export function AdminLayout() {
-  const { session, can, logout } = useStore();
+  const { data, session, can, logout } = useStore();
   const navigate = useNavigate();
-  const items = ADMIN_NAV.filter(([key]) => can(key));
+  const { pathname } = useLocation();
+  const clock = useClockLine();
+
+  const items = ADMIN_NAV.filter((item) => can(item.key));
+  const groups = [];
+  for (const item of items) {
+    if (item.section || groups.length === 0) {
+      groups.push({ name: item.section || 'Overview', items: [] });
+    }
+    groups[groups.length - 1].items.push(item);
+  }
+
+  const title = ADMIN_TITLES[pathname];
+  const memberCount = data.members.length.toLocaleString('en-US');
+  const roleLabel = session.role === 'owner' ? 'Owner' : 'Administrator';
 
   return (
     <div className="flex min-h-screen bg-base">
-      <aside className="sticky top-0 flex h-screen w-60 shrink-0 flex-col border-r border-border bg-secondary/40 p-5">
-        <Brand />
-        <nav className="mt-10 space-y-1">
-          {items.map(([key, label, to]) => (
-            <NavLink key={key} to={to} end={to === '/admin'} className={linkCls}>
-              {label}
-            </NavLink>
+      <aside className="sticky top-0 flex h-screen w-[260px] shrink-0 flex-col border-r border-hairline bg-panel">
+        <div className="px-6 pt-6">
+          <div className="relative inline-block">
+            <span className="block font-display text-[24px] leading-[24px] tracking-[0.5px] text-text">GOPA</span>
+            <span className="absolute left-[70px] top-[2px] h-1.5 w-1.5 bg-lime" />
+          </div>
+          <p className="mt-2 text-[7px] font-semibold uppercase leading-none tracking-[1.6px] text-faint">
+            Gym Management
+          </p>
+        </div>
+
+        <nav className="mt-[42px] flex-1 overflow-y-auto px-4">
+          {groups.map((group, index) => (
+            <div key={group.name} className={index === 0 ? '' : 'mt-4'}>
+              <p className="px-2 text-[8px] font-semibold uppercase leading-none tracking-[1.4px] text-faint">
+                {group.name}
+              </p>
+              <div className="mt-2 space-y-1">
+                {group.items.map((item) => (
+                  <SidebarLink key={item.key} item={item} count={memberCount} />
+                ))}
+              </div>
+            </div>
           ))}
         </nav>
-        <div className="mt-auto border-t border-border pt-4">
-          <p className="text-sm text-text">{session.name}</p>
-          <p className="text-xs capitalize text-muted">{session.role}</p>
-          <Button
-            variant="ghost"
-            className="mt-3"
-            onClick={() => {
-              logout();
-              navigate('/login');
-            }}
-          >
-            Logout
-          </Button>
+
+        <div className="px-4 pb-6">
+          <div className="h-px w-full bg-hairline" />
+          <div className="mt-[22px] flex items-center gap-3 px-1">
+            <Initials name={session.name} className="h-8 w-8 text-[11px]" />
+            <div className="min-w-0">
+              <p className="truncate text-[11px] font-medium leading-[13px] text-text">{session.name}</p>
+              <p className="mt-[3px] truncate text-[8.5px] leading-[10px] text-faint">{roleLabel}</p>
+            </div>
+            <button
+              type="button"
+              onClick={() => {
+                logout();
+                navigate('/login');
+              }}
+              aria-label="Logout"
+              title="Logout"
+              className="ml-auto text-faint transition hover:text-text"
+            >
+              <IconLogout />
+            </button>
+          </div>
         </div>
       </aside>
-      <main className="min-w-0 flex-1 p-8">
-        <Outlet />
-      </main>
+
+      <div className="flex min-w-0 flex-1 flex-col">
+        <header className="flex h-[72px] shrink-0 items-center gap-4 border-b border-hairline px-4 sm:px-8">
+          <div className="min-w-0">
+            <h1 className="truncate font-condensed text-[24px] font-bold leading-[29px] text-text">{title}</h1>
+            <p className="text-[9.5px] leading-[11px] text-faint">{clock}</p>
+          </div>
+
+          <div className="ml-auto flex items-center gap-4">
+            <form
+              onSubmit={(e) => {
+                e.preventDefault();
+                navigate('/admin/members');
+              }}
+              className="hidden h-[34px] w-[220px] items-center gap-2 rounded-full border border-line bg-secondary pl-[15px] lg:flex"
+            >
+              <IconSearch className="text-faint" />
+              <input
+                className="h-full w-full bg-transparent pr-3 text-[9px] text-text placeholder:text-faint focus:outline-none"
+                placeholder="Search members, transactions…"
+                aria-label="Search"
+              />
+            </form>
+            <button
+              type="button"
+              aria-label="Notifications"
+              className="flex h-9 w-9 items-center justify-center rounded-full border border-line bg-secondary text-muted transition hover:text-text"
+            >
+              <IconBell />
+            </button>
+            <ThemeToggle className="!h-9 !w-9 !border-line" />
+            <div className="relative">
+              <Initials name={session.name} className="h-8 w-8 text-[10px]" />
+              <span className="absolute -bottom-0.5 -right-0.5 h-2 w-2 rounded-full bg-lime ring-2 ring-base" />
+            </div>
+          </div>
+        </header>
+
+        <main className="min-w-0 flex-1 px-4 py-6 sm:px-8 sm:py-8">
+          <Outlet />
+        </main>
+      </div>
     </div>
   );
 }
@@ -87,6 +260,7 @@ export function MemberLayout() {
         </nav>
         <div className="flex items-center gap-4">
           <span className="hidden text-sm text-muted sm:block">{session.name}</span>
+          <ThemeToggle />
           <Button
             variant="secondary"
             className="h-9 px-4"

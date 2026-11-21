@@ -1,12 +1,13 @@
 import { useState } from 'react';
 import { useStore } from '../../lib/store';
+import { config } from '../../lib/config';
 import { currentMembership, fmtDate, statusOf } from '../../lib/utils';
-import { Avatar, Badge, Button, Card, Field, Modal, Notice, PageHeader, TD, TH, inputCls } from '../../components/ui';
+import { Avatar, Badge, Button, Card, Field, Modal, Notice, TD, TH, inputCls } from '../../components/ui';
 import Barcode from '../../components/Barcode';
 
 const EMPTY = { name: '', phone: '', email: '', photo: null };
 const PHOTO_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
-const MAX_PHOTO_BYTES = 500 * 1024;
+const MAX_PHOTO_BYTES = config.maxPhotoKb * 1024;
 
 export default function Members() {
   const { data, saveMember, deleteMember } = useStore();
@@ -80,7 +81,7 @@ export default function Members() {
       return;
     }
     if (file.size > MAX_PHOTO_BYTES) {
-      setErrors((x) => ({ ...x, photo: 'Ukuran foto maksimal 500 KB.' }));
+      setErrors((x) => ({ ...x, photo: `Ukuran foto maksimal ${config.maxPhotoKb} KB.` }));
       return;
     }
     const reader = new FileReader();
@@ -99,11 +100,9 @@ export default function Members() {
 
   return (
     <>
-      <PageHeader
-        title="Members"
-        subtitle="Kelola data anggota, foto profil, dan barcode identitas."
-        action={<Button onClick={openNew}>+ Tambah anggota</Button>}
-      />
+      <div className="mb-4 flex justify-end">
+        <Button onClick={openNew}>+ Tambah anggota</Button>
+      </div>
 
       <div className="mb-4 flex flex-wrap gap-3">
         <input

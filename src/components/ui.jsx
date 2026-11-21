@@ -6,7 +6,7 @@ export const TD = 'px-4 py-3 text-sm text-text';
 
 export function Button({ variant = 'primary', className = '', ...props }) {
   const base =
-    'inline-flex items-center justify-center gap-2 h-11 px-5 rounded-full text-sm font-semibold uppercase tracking-wider transition disabled:opacity-40 disabled:cursor-not-allowed';
+    'inline-flex items-center justify-center gap-2 h-11 px-5 rounded-full font-condensed text-[15px] font-bold uppercase tracking-[0.09em] transition disabled:opacity-40 disabled:cursor-not-allowed';
   const variants = {
     primary: 'bg-lime text-ink hover:bg-limeBright',
     secondary: 'bg-secondary text-text border border-border hover:border-lime/40',
@@ -33,8 +33,8 @@ export function Field({ label, error, children }) {
 export function Badge({ status }) {
   const map = {
     active: ['Aktif', 'bg-lime/10 text-lime'],
-    expired: ['Kedaluwarsa', 'bg-white/5 text-muted'],
-    none: ['Belum ada', 'bg-white/5 text-muted'],
+    expired: ['Kedaluwarsa', 'bg-dim/5 text-muted'],
+    none: ['Belum ada', 'bg-dim/5 text-muted'],
     pending: ['Pending', 'bg-pending/10 text-pending'],
   };
   const [label, cls] = map[status] || map.none;
