@@ -1,16 +1,10 @@
 import { useState } from 'react';
-import { Navigate } from 'react-router-dom';
+import { Link, Navigate } from 'react-router-dom';
 import { homeFor, useStore } from '../lib/store';
 import { Brand } from '../components/Layout';
 import { Button, Card, Field, Notice, inputCls } from '../components/ui';
-import { config } from '../lib/config';
+import { config, demoAccounts } from '../lib/config';
 import ThemeToggle from '../components/ThemeToggle';
-
-const DEMO = [
-  ['Admin', 'admin@gopagym.id', 'admin123'],
-  ['Owner', 'owner@gopagym.id', 'owner123'],
-  ['Member', 'arif@mail.com', 'member123'],
-];
 
 export default function Login() {
   const { session, login } = useStore();
@@ -34,7 +28,15 @@ export default function Login() {
       <section className="flex flex-col justify-between p-10 lg:p-16">
         <div className="flex items-center justify-between">
           <Brand />
-          <ThemeToggle />
+          <div className="flex items-center gap-3">
+            <Link
+              to="/"
+              className="inline-flex h-9 items-center gap-2 rounded-full border border-line bg-secondary px-4 text-xs font-semibold uppercase tracking-wider text-muted transition hover:border-lime/40 hover:text-lime"
+            >
+              <span aria-hidden="true">←</span> Kembali
+            </Link>
+            <ThemeToggle />
+          </div>
         </div>
         <div className="mt-16 lg:mt-0">
           <h1 className="font-display text-7xl uppercase leading-[0.95] text-text">
@@ -84,9 +86,9 @@ export default function Login() {
             <div className="mt-8 border-t border-border pt-5">
               <p className="micro mb-3">Akun demo</p>
               <ul className="space-y-2 text-xs text-muted">
-                {DEMO.map(([role, email, pass]) => (
-                  <li key={role}>
-                    <span className="text-text">{role}:</span> {email} / {pass}
+                {demoAccounts.map(({ label, email, password }) => (
+                  <li key={label}>
+                    <span className="text-text">{label}:</span> {email} / {password}
                   </li>
                 ))}
               </ul>

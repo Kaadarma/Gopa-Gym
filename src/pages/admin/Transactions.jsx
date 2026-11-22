@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useStore } from '../../lib/store';
 import { fmtDate, fmtRp, today } from '../../lib/utils';
-import { Button, Card, Field, TD, TH, inputCls } from '../../components/ui';
+import { Button, Card, Field, Select, TD, TH, inputCls } from '../../components/ui';
 
 const METHODS = ['Tunai', 'Transfer', 'QRIS', 'Debit'];
 const EMPTY = { memberId: '', amount: '', method: 'Tunai', date: today(), note: '' };
@@ -50,25 +50,26 @@ export default function Transactions() {
           <p className="micro">Transaksi baru</p>
           <form onSubmit={submit} className="mt-5 space-y-4" noValidate>
             <Field label="Anggota" error={errors.memberId}>
-              <select className={inputCls} value={form.memberId} onChange={(e) => setForm({ ...form, memberId: e.target.value })}>
-                <option value="">Pilih anggota</option>
-                {data.members.map((m) => (
-                  <option key={m.id} value={m.id}>
-                    {m.name} ({m.code})
-                  </option>
-                ))}
-              </select>
+              <Select
+                value={form.memberId}
+                onChange={(v) => setForm({ ...form, memberId: v })}
+                searchable
+                options={[
+                  { value: '', label: 'Pilih anggota' },
+                  ...data.members.map((m) => ({ value: String(m.id), label: `${m.name} (${m.code})` })),
+                ]}
+              />
             </Field>
             <Field label="Nominal (Rp)" error={errors.amount}>
               <input type="number" min="0" className={inputCls} value={form.amount} onChange={(e) => setForm({ ...form, amount: e.target.value })} />
             </Field>
             <div className="grid grid-cols-2 gap-3">
               <Field label="Metode">
-                <select className={inputCls} value={form.method} onChange={(e) => setForm({ ...form, method: e.target.value })}>
-                  {METHODS.map((m) => (
-                    <option key={m}>{m}</option>
-                  ))}
-                </select>
+                <Select
+                  value={form.method}
+                  onChange={(v) => setForm({ ...form, method: v })}
+                  options={METHODS.map((m) => ({ value: m, label: m }))}
+                />
               </Field>
               <Field label="Tanggal" error={errors.date}>
                 <input type="date" className={inputCls} value={form.date} onChange={(e) => setForm({ ...form, date: e.target.value })} />

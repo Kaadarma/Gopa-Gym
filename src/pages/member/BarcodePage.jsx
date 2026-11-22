@@ -1,4 +1,4 @@
-import { useStore } from '../../lib/store';
+import { qrValueOf, useStore } from '../../lib/store';
 import { statusOf } from '../../lib/utils';
 import Barcode from '../../components/Barcode';
 import { Badge, Card, Notice, PageHeader } from '../../components/ui';
@@ -21,7 +21,7 @@ export default function MemberBarcode() {
           <Badge status={status} />
         </div>
         <div className="mt-6 rounded-xl bg-white p-6">
-          <Barcode value={member.code} height={110} />
+          <Barcode value={qrValueOf(member)} label={member.code} height={110} />
         </div>
         {status !== 'active' && (
           <div className="mt-6">

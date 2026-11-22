@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useStore } from '../../lib/store';
 import { fmtDate, today } from '../../lib/utils';
-import { Badge, Button, Card, Field, Notice, TD, TH, inputCls } from '../../components/ui';
+import { Badge, Button, Card, Field, Notice, Select, TD, TH, inputCls } from '../../components/ui';
 
 const METHODS = ['Tunai', 'Transfer', 'QRIS', 'Debit'];
 
@@ -17,7 +17,7 @@ export default function Memberships() {
   });
   const [errors, setErrors] = useState({});
   const [result, setResult] = useState(null);
-  const [filterMember, setFilterMember] = useState('');
+  const [filterStatus, setFilterStatus] = useState('');
 
   const onPackage = (id) => {
     const pkg = data.packages.find((p) => p.id === Number(id));
@@ -53,7 +53,11 @@ export default function Memberships() {
   const pkgName = (id) => data.packages.find((p) => p.id === id)?.name ?? '-';
 
   const history = data.memberships
-    .filter((m) => !filterMember || m.memberId === Number(filterMember))
+    .filter((m) => {
+      if (!filterStatus) return true;
+      const active = m.end >= today();
+      return filterStatus === 'active' ? active : !active;
+    })
     .sort((a, b) => b.start.localeCompare(a.start));
 
   return (
@@ -63,24 +67,25 @@ export default function Memberships() {
           <p className="micro">Aktivasi / perpanjangan</p>
           <form onSubmit={submit} className="mt-5 space-y-4" noValidate>
             <Field label="Anggota" error={errors.memberId}>
-              <select className={inputCls} value={form.memberId} onChange={(e) => setForm({ ...form, memberId: e.target.value })}>
-                <option value="">Pilih anggota</option>
-                {data.members.map((m) => (
-                  <option key={m.id} value={m.id}>
-                    {m.name} ({m.code})
-                  </option>
-                ))}
-              </select>
+              <Select
+                value={form.memberId}
+                onChange={(v) => setForm({ ...form, memberId: v })}
+                searchable
+                options={[
+                  { value: '', label: 'Pilih anggota' },
+                  ...data.members.map((m) => ({ value: String(m.id), label: `${m.name} (${m.code})` })),
+                ]}
+              />
             </Field>
             <Field label="Paket" error={errors.packageId}>
-              <select className={inputCls} value={form.packageId} onChange={(e) => onPackage(e.target.value)}>
-                <option value="">Pilih paket</option>
-                {data.packages.map((p) => (
-                  <option key={p.id} value={p.id}>
-                    {p.name} · {p.durationDays} hari
-                  </option>
-                ))}
-              </select>
+              <Select
+                value={form.packageId}
+                onChange={(v) => onPackage(v)}
+                options={[
+                  { value: '', label: 'Pilih paket' },
+                  ...data.packages.map((p) => ({ value: String(p.id), label: `${p.name} · ${p.durationDays} hari` })),
+                ]}
+              />
             </Field>
             <Field label="Tanggal mulai" error={errors.start}>
               <input type="date" className={inputCls} value={form.start} onChange={(e) => setForm({ ...form, start: e.target.value })} />
@@ -95,11 +100,11 @@ export default function Memberships() {
                   <input type="number" min="0" className={inputCls} value={form.amount} onChange={(e) => setForm({ ...form, amount: e.target.value })} />
                 </Field>
                 <Field label="Metode">
-                  <select className={inputCls} value={form.method} onChange={(e) => setForm({ ...form, method: e.target.value })}>
-                    {METHODS.map((m) => (
-                      <option key={m}>{m}</option>
-                    ))}
-                  </select>
+                  <Select
+                    value={form.method}
+                    onChange={(v) => setForm({ ...form, method: v })}
+                    options={METHODS.map((m) => ({ value: m, label: m }))}
+                  />
                 </Field>
               </div>
             )}
@@ -113,14 +118,16 @@ export default function Memberships() {
         <Card className="overflow-hidden p-0 lg:col-span-3">
           <div className="flex flex-wrap items-center justify-between gap-3 px-6 pt-6">
             <p className="micro">Riwayat membership</p>
-            <select className={`${inputCls} w-auto`} value={filterMember} onChange={(e) => setFilterMember(e.target.value)}>
-              <option value="">Semua anggota</option>
-              {data.members.map((m) => (
-                <option key={m.id} value={m.id}>
-                  {m.name}
-                </option>
-              ))}
-            </select>
+            <Select
+              className="w-auto"
+              value={filterStatus}
+              onChange={(v) => setFilterStatus(v)}
+              options={[
+                { value: '', label: 'Semua status' },
+                { value: 'active', label: 'Aktif' },
+                { value: 'expired', label: 'Kedaluwarsa' },
+              ]}
+            />
           </div>
           <div className="mt-4 overflow-x-auto">
             <table className="w-full">

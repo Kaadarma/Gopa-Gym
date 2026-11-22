@@ -1,11 +1,11 @@
 import { useState } from 'react';
-import { useStore } from '../../lib/store';
+import { qrValueOf, useStore } from '../../lib/store';
 import { config } from '../../lib/config';
 import { currentMembership, fmtDate, statusOf } from '../../lib/utils';
-import { Avatar, Badge, Button, Card, Field, Modal, Notice, TD, TH, inputCls } from '../../components/ui';
+import { Avatar, Badge, Button, Card, Field, Modal, Notice, Select, TD, TH, inputCls } from '../../components/ui';
 import Barcode from '../../components/Barcode';
 
-const EMPTY = { name: '', phone: '', email: '', photo: null };
+const EMPTY = { name: '', phone: '', email: '', password: '', photo: null };
 const PHOTO_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
 const MAX_PHOTO_BYTES = config.maxPhotoKb * 1024;
 
@@ -44,7 +44,8 @@ export default function Members() {
 
   const openEdit = (m) => {
     setEditingId(m.id);
-    setForm({ name: m.name, phone: m.phone, email: m.email || '', photo: m.photo || null });
+    const acc = data.users.find((u) => u.memberId === m.id);
+    setForm({ name: m.name, phone: m.phone, email: acc?.email || m.email || '', password: '', photo: m.photo || null });
     setErrors({});
     setModal('form');
   };
@@ -54,7 +55,10 @@ export default function Members() {
     if (!form.name.trim()) e.name = 'Nama wajib diisi.';
     if (!form.phone.trim()) e.phone = 'Nomor telepon wajib diisi.';
     else if (!/^[0-9+\-\s]{8,20}$/.test(form.phone.trim())) e.phone = 'Nomor telepon tidak valid.';
-    if (form.email && !/^\S+@\S+\.\S+$/.test(form.email.trim())) e.email = 'Format email tidak valid.';
+    if (!form.email.trim()) e.email = 'Email wajib diisi (dipakai untuk login member).';
+    else if (!/^\S+@\S+\.\S+$/.test(form.email.trim())) e.email = 'Format email tidak valid.';
+    if (!editingId && !form.password) e.password = 'Password wajib diisi untuk akun member.';
+    else if (form.password && form.password.length < 6) e.password = 'Password minimal 6 karakter.';
     return e;
   };
 
@@ -63,13 +67,18 @@ export default function Members() {
     const e = validate();
     setErrors(e);
     if (Object.keys(e).length) return;
-    saveMember({
+    const res = saveMember({
       ...(editingId ? { id: editingId } : {}),
       name: form.name.trim(),
       phone: form.phone.trim(),
       email: form.email.trim(),
+      password: form.password,
       photo: form.photo,
     });
+    if (!res.ok) {
+      setErrors({ email: res.msg });
+      return;
+    }
     setModal(null);
   };
 
@@ -111,12 +120,17 @@ export default function Members() {
           value={q}
           onChange={(e) => setQ(e.target.value)}
         />
-        <select className={`${inputCls} w-auto`} value={filter} onChange={(e) => setFilter(e.target.value)}>
-          <option value="all">Semua status</option>
-          <option value="active">Aktif</option>
-          <option value="expired">Kedaluwarsa</option>
-          <option value="none">Belum ada membership</option>
-        </select>
+        <Select
+          className="w-auto"
+          value={filter}
+          onChange={(v) => setFilter(v)}
+          options={[
+            { value: 'all', label: 'Semua status' },
+            { value: 'active', label: 'Aktif' },
+            { value: 'expired', label: 'Kedaluwarsa' },
+            { value: 'none', label: 'Belum ada membership' },
+          ]}
+        />
       </div>
 
       <Card className="overflow-hidden p-0">
@@ -201,8 +215,26 @@ export default function Members() {
           <Field label="Nomor telepon" error={errors.phone}>
             <input className={inputCls} value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} />
           </Field>
-          <Field label="Email (opsional)" error={errors.email}>
-            <input className={inputCls} value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} />
+          <Field label="Email (username login member)" error={errors.email}>
+            <input
+              type="email"
+              className={inputCls}
+              placeholder="nama@email.com"
+              value={form.email}
+              onChange={(e) => setForm({ ...form, email: e.target.value })}
+            />
+          </Field>
+          <Field
+            label={editingId ? 'Password baru (kosongkan jika tidak diubah)' : 'Password akun member'}
+            error={errors.password}
+          >
+            <input
+              type="password"
+              className={inputCls}
+              placeholder="Minimal 6 karakter"
+              value={form.password}
+              onChange={(e) => setForm({ ...form, password: e.target.value })}
+            />
           </Field>
           <div className="flex justify-end gap-3 pt-2">
             <Button variant="secondary" type="button" onClick={() => setModal(null)}>
@@ -214,15 +246,19 @@ export default function Members() {
       </Modal>
 
       <Modal open={modal === 'barcode'} title="Barcode anggota" onClose={() => setModal(null)}>
-        {barcodeMember && (
-          <div className="space-y-4 text-center">
-            <p className="text-text">{barcodeMember.name}</p>
-            <div className="rounded-xl bg-white p-4">
-              <Barcode value={barcodeMember.code} />
+        {barcodeMember && (() => {
+          // Ambil data terbaru: QR berganti setiap check-in.
+          const fresh = data.members.find((x) => x.id === barcodeMember.id) ?? barcodeMember;
+          return (
+            <div className="space-y-4 text-center">
+              <p className="text-text">{fresh.name}</p>
+              <div className="rounded-xl bg-white p-4">
+                <Barcode value={qrValueOf(fresh)} label={fresh.code} />
+              </div>
+              <Notice ok>Kode unik: {fresh.code}. QR akan berganti setelah check-in berikutnya.</Notice>
             </div>
-            <Notice ok>Kode unik: {barcodeMember.code}</Notice>
-          </div>
-        )}
+          );
+        })()}
       </Modal>
     </>
   );

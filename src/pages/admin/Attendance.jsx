@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useStore } from '../../lib/store';
 import { fmtDate } from '../../lib/utils';
-import { Avatar, Card, TD, TH, inputCls } from '../../components/ui';
+import { Avatar, Card, Select, TD, TH, inputCls } from '../../components/ui';
 
 export default function Attendance() {
   const { data } = useStore();
@@ -17,14 +17,15 @@ export default function Attendance() {
     <>
       <div className="mb-4 flex flex-wrap gap-3">
         <input type="date" className={`${inputCls} w-auto`} value={date} onChange={(e) => setDate(e.target.value)} />
-        <select className={`${inputCls} w-auto`} value={memberId} onChange={(e) => setMemberId(e.target.value)}>
-          <option value="">Semua anggota</option>
-          {data.members.map((m) => (
-            <option key={m.id} value={m.id}>
-              {m.name}
-            </option>
-          ))}
-        </select>
+        <Select
+          className="w-auto"
+          value={memberId}
+          onChange={(v) => setMemberId(v)}
+          options={[
+            { value: '', label: 'Semua anggota' },
+            ...data.members.map((m) => ({ value: String(m.id), label: m.name })),
+          ]}
+        />
         {(date || memberId) && (
           <button
             className="text-xs font-semibold uppercase tracking-wider text-muted hover:text-lime"

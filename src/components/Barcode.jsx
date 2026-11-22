@@ -1,23 +1,13 @@
-import { useEffect, useRef } from 'react';
-import JsBarcode from 'jsbarcode';
+﻿import { QRCodeSVG } from 'qrcode.react';
 
-// Barcode CODE128 untuk kode anggota, dibuat dengan JsBarcode.
-export default function Barcode({ value, height = 90 }) {
-  const ref = useRef(null);
-
-  useEffect(() => {
-    if (!ref.current || !value) return;
-    JsBarcode(ref.current, value, {
-      format: 'CODE128',
-      lineColor: '#0A0C06',
-      background: '#FFFFFF',
-      width: 2,
-      height,
-      displayValue: true,
-      fontSize: 14,
-      margin: 12,
-    });
-  }, [value, height]);
-
-  return <svg ref={ref} className="mx-auto max-w-full" />;
+// QR code kotak. "value" adalah isi QR, "label" (opsional) teks yang tampil di bawahnya.
+// "height" dipakai sebagai ukuran sisi QR (px).
+export default function Barcode({ value, label, height = 90 }) {
+  if (!value) return null;
+  return (
+    <div className="mx-auto flex w-fit flex-col items-center">
+      <QRCodeSVG value={value} size={height * 2} level="M" fgColor="#0A0C06" bgColor="#FFFFFF" />
+      {label && <p className="mt-2 font-mono text-[11px] tracking-[0.12em] text-[#0A0C06]">{label}</p>}
+    </div>
+  );
 }

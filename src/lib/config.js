@@ -15,3 +15,22 @@ export const config = {
   // Tampilkan kartu akun demo di halaman login.
   showDemoAccounts: env.VITE_SHOW_DEMO_ACCOUNTS !== 'false',
 };
+
+export const demoAccounts = [
+  {
+    label: 'Admin',
+    email: env.VITE_DEMO_ADMIN_EMAIL || 'admin@example.com',
+    password: env.VITE_DEMO_ADMIN_PASSWORD || 'demo-admin',
+    role: 'admin',
+    name: 'Raka Pratama',
+    memberId: null,
+  },
+  {
+    label: 'Member',
+    email: env.VITE_DEMO_MEMBER_EMAIL || 'member@example.com',
+    password: env.VITE_DEMO_MEMBER_PASSWORD || 'demo-member',
+    role: 'member',
+    name: 'Arif Rahman',
+    memberId: 1,
+  },
+];

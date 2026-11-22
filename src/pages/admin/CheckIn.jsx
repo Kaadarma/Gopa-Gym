@@ -1,23 +1,101 @@
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
+import { Html5Qrcode } from 'html5-qrcode';
 import { useStore } from '../../lib/store';
 import { fmtDate, today } from '../../lib/utils';
-import { Avatar, Button, Card, Field, Notice, TD, TH, inputCls } from '../../components/ui';
+import { Avatar, Button, Card, Field, Notice, Select, TD, TH, inputCls } from '../../components/ui';
 
 export default function CheckIn() {
-  const { data, checkIn } = useStore();
+  const { data, checkIn, deleteAttendance } = useStore();
   const [code, setCode] = useState('');
   const [manualId, setManualId] = useState('');
   const [result, setResult] = useState(null);
+  const [cameraOn, setCameraOn] = useState(false);
+  const [cameraStatus, setCameraStatus] = useState('');
+  const [cameraError, setCameraError] = useState('');
+  const containerRef = useRef(null);
+  const scannerRef = useRef(null);
+  const lastScanRef = useRef({ value: '', at: 0 });
 
   const run = (value) => {
     if (!value || !value.trim()) {
       setResult({ ok: false, msg: 'Masukkan kode QR/barcode anggota.' });
-      return;
+      return null;
     }
     const res = checkIn(value);
     setResult(res);
     if (res.ok) setCode('');
+    return res;
   };
+
+  // Callback scanner dibuat sekali per aktivasi kamera, jadi selalu memanggil versi run terbaru.
+  const runRef = useRef(run);
+  runRef.current = run;
+
+  // Kamera: hanya aktif saat cameraOn. Tiap effect membuat host element sendiri,
+  // supaya start/stop dari React StrictMode (yang menjalankan effect dua kali) tidak bertabrakan.
+  useEffect(() => {
+    if (!cameraOn) return undefined;
+    const container = containerRef.current;
+    if (!container) return undefined;
+
+    if (!window.isSecureContext || !navigator.mediaDevices?.getUserMedia) {
+      setCameraError('Kamera hanya bisa dipakai di https atau localhost.');
+      setCameraOn(false);
+      return undefined;
+    }
+
+    let cancelled = false;
+    const host = document.createElement('div');
+    host.id = `qr-camera-${Date.now()}`;
+    container.appendChild(host);
+    const scanner = new Html5Qrcode(host.id, false);
+    scannerRef.current = scanner;
+    setCameraStatus('Meminta izin kamera…');
+
+    scanner
+      .start(
+        { facingMode: 'environment' },
+        { fps: 10, qrbox: { width: 220, height: 220 } },
+        (decoded) => {
+          // Cegah kode yang sama terbaca berulang dalam 3 detik.
+          const now = Date.now();
+          const last = lastScanRef.current;
+          if (decoded === last.value && now - last.at < 3000) return;
+          lastScanRef.current = { value: decoded, at: now };
+          const res = runRef.current(decoded);
+          // Check-in berhasil: kamera mati otomatis.
+          if (res?.ok) setCameraOn(false);
+        },
+        () => {},
+      )
+      .then(() => {
+        if (!cancelled) setCameraStatus('Kamera aktif. Arahkan ke QR anggota.');
+      })
+      .catch((err) => {
+        if (cancelled) return;
+        setCameraStatus('');
+        setCameraError(`Kamera tidak bisa dibuka: ${err?.message || err}`);
+        setCameraOn(false);
+      });
+
+    return () => {
+      cancelled = true;
+      scannerRef.current = null;
+      setCameraStatus('');
+      scanner
+        .stop()
+        .catch(() => {})
+        .finally(() => {
+          try {
+            scanner.clear();
+          } catch {
+            // host sudah tidak ada
+          }
+          host.remove();
+        });
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [cameraOn]);
 
   const t = today();
   const todays = data.attendance
@@ -29,6 +107,31 @@ export default function CheckIn() {
     <>
       <div className="grid gap-4 lg:grid-cols-5">
         <Card className="space-y-6 lg:col-span-2">
+          <div className="space-y-3">
+            <div className="flex items-center justify-between">
+              <p className="micro">Scan kamera</p>
+              <Button
+                variant={cameraOn ? 'secondary' : 'primary'}
+                className="h-9 px-4"
+                onClick={() => {
+                  setCameraError('');
+                  setCameraOn((on) => !on);
+                }}
+              >
+                {cameraOn ? 'Matikan kamera' : 'Nyalakan kamera'}
+              </Button>
+            </div>
+            <div
+              ref={containerRef}
+              className={`mx-auto w-full max-w-[320px] overflow-hidden rounded-xl bg-black ${cameraOn ? '' : 'hidden'}`}
+            />
+            {cameraOn && cameraStatus && <p className="text-xs text-muted">{cameraStatus}</p>}
+            {cameraError && <Notice ok={false}>{cameraError}</Notice>}
+            <p className="text-xs text-muted">Arahkan QR code anggota ke kamera. Check-in otomatis setelah terbaca.</p>
+          </div>
+
+          <div className="border-t border-border pt-6" />
+
           <form
             className="space-y-4"
             onSubmit={(e) => {
@@ -56,14 +159,15 @@ export default function CheckIn() {
           <div className="border-t border-border pt-6">
             <p className="micro mb-3">Pencarian manual</p>
             <div className="flex gap-2">
-              <select className={inputCls} value={manualId} onChange={(e) => setManualId(e.target.value)}>
-                <option value="">Pilih anggota</option>
-                {data.members.map((m) => (
-                  <option key={m.id} value={m.id}>
-                    {m.name} ({m.code})
-                  </option>
-                ))}
-              </select>
+              <Select
+                value={manualId}
+                onChange={(v) => setManualId(v)}
+                searchable
+                options={[
+                  { value: '', label: 'Pilih anggota' },
+                  ...data.members.map((m) => ({ value: String(m.id), label: `${m.name} (${m.code})` })),
+                ]}
+              />
               <Button
                 variant="secondary"
                 className="px-4"
@@ -91,12 +195,13 @@ export default function CheckIn() {
                   <th className={TH}>Anggota</th>
                   <th className={TH}>Kode</th>
                   <th className={TH}>Waktu</th>
+                  <th className={TH}>Aksi</th>
                 </tr>
               </thead>
               <tbody>
                 {todays.length === 0 && (
                   <tr>
-                    <td className={`${TD} text-muted`} colSpan={3}>
+                    <td className={`${TD} text-muted`} colSpan={4}>
                       Belum ada check-in hari ini.
                     </td>
                   </tr>
@@ -113,6 +218,19 @@ export default function CheckIn() {
                       </td>
                       <td className={`${TD} text-muted`}>{m?.code ?? '-'}</td>
                       <td className={TD}>{a.time.slice(0, 5)}</td>
+                      <td className={TD}>
+                        <button
+                          type="button"
+                          className="text-xs font-semibold uppercase tracking-wider text-danger hover:underline"
+                          onClick={() => {
+                            if (window.confirm(`Hapus check-in ${m?.name ?? 'anggota'} pukul ${a.time.slice(0, 5)}?`)) {
+                              deleteAttendance(a.id);
+                            }
+                          }}
+                        >
+                          Hapus
+                        </button>
+                      </td>
                     </tr>
                   );
                 })}

@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { useStore } from '../lib/store';
 import Chatbot from './Chatbot';
@@ -144,6 +144,24 @@ export function AdminLayout() {
   const title = ADMIN_TITLES[pathname];
   const memberCount = data.members.length.toLocaleString('en-US');
   const roleLabel = session.role === 'owner' ? 'Owner' : 'Administrator';
+  const [menuOpen, setMenuOpen] = useState(false);
+  const menuRef = useRef(null);
+
+  useEffect(() => {
+    if (!menuOpen) return;
+    const onPointerDown = (e) => {
+      if (menuRef.current && !menuRef.current.contains(e.target)) setMenuOpen(false);
+    };
+    const onKeyDown = (e) => {
+      if (e.key === 'Escape') setMenuOpen(false);
+    };
+    document.addEventListener('pointerdown', onPointerDown);
+    document.addEventListener('keydown', onKeyDown);
+    return () => {
+      document.removeEventListener('pointerdown', onPointerDown);
+      document.removeEventListener('keydown', onKeyDown);
+    };
+  }, [menuOpen]);
 
   return (
     <div className="flex min-h-screen bg-base">
@@ -227,9 +245,46 @@ export function AdminLayout() {
               <IconBell />
             </button>
             <ThemeToggle className="!h-9 !w-9 !border-line" />
-            <div className="relative">
-              <Initials name={session.name} className="h-8 w-8 text-[10px]" />
-              <span className="absolute -bottom-0.5 -right-0.5 h-2 w-2 rounded-full bg-lime ring-2 ring-base" />
+            <div className="relative" ref={menuRef}>
+              <button
+                type="button"
+                onClick={() => setMenuOpen((open) => !open)}
+                aria-label="User menu"
+                aria-expanded={menuOpen}
+                className="block rounded-full focus:outline-none focus-visible:ring-2 focus-visible:ring-lime"
+              >
+                <Initials name={session.name} className="h-8 w-8 text-[10px]" />
+                <span className="absolute -bottom-0.5 -right-0.5 h-2 w-2 rounded-full bg-lime ring-2 ring-base" />
+              </button>
+              {menuOpen && (
+                <div className="absolute right-0 top-[44px] z-50 w-[224px] rounded-xl border border-line bg-secondary p-3 shadow-xl shadow-black/40">
+                  <div className="flex items-center gap-3">
+                    <Initials name={session.name} className="h-9 w-9 text-[11px]" />
+                    <div className="min-w-0">
+                      <p className="truncate text-[11px] font-medium leading-[14px] text-text">{session.name}</p>
+                      <p className="mt-[2px] truncate text-[9px] leading-[11px] text-faint">{roleLabel}</p>
+                    </div>
+                  </div>
+                  <div className="mt-3 border-t border-hairline pt-3">
+                    <p className="truncate text-[9px] leading-[11px] text-faint">{session.email}</p>
+                    <p className="mt-1 text-[9px] leading-[11px] text-faint">
+                      Role: <span className="text-muted">{roleLabel}</span>
+                    </p>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setMenuOpen(false);
+                      logout();
+                      navigate('/login');
+                    }}
+                    className="mt-3 flex w-full items-center gap-2 rounded-lg border border-line px-3 py-2 text-[10px] font-medium text-text transition hover:border-lime/40 hover:text-lime"
+                  >
+                    <IconLogout />
+                    Log out
+                  </button>
+                </div>
+              )}
             </div>
           </div>
         </header>
