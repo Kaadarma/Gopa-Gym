@@ -11,7 +11,6 @@ import { Brand } from '../components/Layout';
 
 gsap.registerPlugin(ScrollTrigger);
 
-// Fitur per tier mengikuti desain. Harga dan durasi diambil dari data paket (store).
 const TIER_FEATURES = [
   ['Gym floor access', 'Locker room', 'Fitness assessment', '1 guest pass'],
   ['All group classes', 'Sauna & shower', '2 guest passes', 'Monthly PT session'],
@@ -44,7 +43,6 @@ export default function Landing() {
   const packages = data.packages.slice(0, 3);
   const rootRef = useRef(null);
 
-  // Animasi GSAP. Dibungkus matchMedia agar otomatis mati untuk user dengan reduce motion.
   useLayoutEffect(() => {
     const root = rootRef.current;
     const mm = gsap.matchMedia();
@@ -52,7 +50,6 @@ export default function Landing() {
     mm.add('(prefers-reduced-motion: no-preference)', () => {
       const q = (sel) => root.querySelectorAll(sel);
 
-      // 1. Intro hero
       gsap
         .timeline({ defaults: { ease: 'power3.out' } })
         .from(q('[data-hero-eyebrow]'), { y: 16, opacity: 0, duration: 0.6 })
@@ -60,17 +57,14 @@ export default function Landing() {
         .from(q('[data-hero-fade]'), { y: 20, opacity: 0, duration: 0.7, stagger: 0.1 }, '-=0.6')
         .from(q('[data-hero-img]'), { clipPath: 'inset(0 0 100% 0)', duration: 1.2, ease: 'power4.inOut' }, '-=1');
 
-      // 2. Parallax ringan pada gambar hero saat di-scroll
       gsap.to(q('[data-parallax]'), {
         yPercent: -8,
         ease: 'none',
         scrollTrigger: { trigger: q('[data-hero-img]')[0], start: 'top bottom', end: 'bottom top', scrub: true },
       });
 
-      // 3. Marquee berjalan tanpa henti
       gsap.to(q('[data-marquee]'), { xPercent: -50, duration: 25, ease: 'none', repeat: -1 });
 
-      // 4. Section muncul saat di-scroll
       q('[data-reveal]').forEach((el) => {
         gsap.from(el, {
           y: 40,
@@ -81,7 +75,6 @@ export default function Landing() {
         });
       });
 
-      // 5. Kartu dalam grup muncul bergantian
       q('[data-reveal-group]').forEach((group) => {
         const items = gsap.utils.toArray(group.children);
         gsap.fromTo(
@@ -99,7 +92,6 @@ export default function Landing() {
         );
       });
 
-      // 6. Angka statistik naik dari 0
       q('[data-count]').forEach((el) => {
         const end = Number(el.dataset.count);
         const suffix = el.dataset.suffix || '';
@@ -116,8 +108,6 @@ export default function Landing() {
       });
     });
 
-    // Posisi trigger harus dihitung ulang setelah gambar dan font selesai dimuat,
-    // jika tidak trigger di bawah fold bisa meleset.
     const refresh = () => ScrollTrigger.refresh();
     window.addEventListener('load', refresh);
     document.fonts?.ready.then(refresh);
@@ -132,7 +122,6 @@ export default function Landing() {
 
   return (
     <div ref={rootRef} id="top" className="min-h-screen overflow-x-hidden bg-base text-text">
-      {/* Navbar */}
       <header className="sticky top-0 z-30 border-b border-border bg-base/90 backdrop-blur">
         <div className="mx-auto flex max-w-7xl items-center justify-between gap-6 px-6 py-4">
           <Brand />
@@ -158,7 +147,6 @@ export default function Landing() {
         </div>
       </header>
 
-      {/* Hero */}
       <section className="mx-auto grid min-h-[calc(100vh-81px)] max-w-7xl items-center gap-12 px-6 py-16 lg:grid-cols-[1.1fr_1fr] lg:gap-10 lg:py-20">
         <div>
           <p data-hero-eyebrow className="micro flex items-center gap-3 !text-lime">
@@ -234,7 +222,6 @@ export default function Landing() {
         </div>
       </section>
 
-      {/* Marquee */}
       <div className="overflow-hidden bg-lime py-4">
         <div data-marquee className="flex w-max whitespace-nowrap font-serif text-xl italic text-ink">
           {[...MARQUEE, ...MARQUEE, ...MARQUEE, ...MARQUEE].map((item, i) => (
@@ -245,7 +232,6 @@ export default function Landing() {
         </div>
       </div>
 
-      {/* Commitment */}
       <section id="commitment" className="mx-auto max-w-7xl px-6 py-24">
         <Eyebrow>Our commitment · 02</Eyebrow>
         <h2 data-reveal className="mt-4 font-display text-[44px] uppercase sm:text-section-xl">
@@ -290,7 +276,6 @@ export default function Landing() {
         </div>
       </section>
 
-      {/* Statistics */}
       <section className="mx-auto max-w-7xl px-6 pb-24">
         <Eyebrow>By the numbers · 03</Eyebrow>
         <div data-reveal-group className="mt-8 grid gap-4 md:grid-cols-3">
@@ -310,7 +295,6 @@ export default function Landing() {
         </div>
       </section>
 
-      {/* Membership */}
       <section id="membership" className="mx-auto max-w-7xl px-6 pb-24">
         <Eyebrow>Membership · 04</Eyebrow>
         <h2 data-reveal className="mt-4 font-display text-[40px] uppercase sm:text-section-lg">
@@ -357,7 +341,6 @@ export default function Landing() {
         </div>
       </section>
 
-      {/* Facilities */}
       <section id="facilities" className="mx-auto max-w-7xl px-6 pb-24">
         <Eyebrow>Facilities · 05</Eyebrow>
         <div className="mt-4 flex flex-wrap items-end justify-between gap-6">
@@ -381,7 +364,6 @@ export default function Landing() {
         </div>
       </section>
 
-      {/* CTA + Footer */}
       <section className="relative overflow-hidden">
         <img src="/images/cta.jpg" alt="" className="absolute inset-0 h-full w-full object-cover" />
         <div className="absolute inset-0 bg-base/70" />

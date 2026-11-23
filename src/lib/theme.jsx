@@ -5,7 +5,6 @@ const ThemeCtx = createContext(null);
 
 const readTheme = () => {
   const saved = localStorage.getItem(KEY);
-  // Default dark, sesuai desain figcraft. Pilihan user disimpan di localStorage.
   return saved === 'light' ? 'light' : 'dark';
 };
 

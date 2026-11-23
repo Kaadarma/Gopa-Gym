@@ -6,7 +6,6 @@ import { IconTrend } from '../../components/icons';
 const WEEKDAYS = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'];
 const MIX_COLORS = ['rgb(var(--lime))', 'rgb(var(--mix-2))', 'rgb(var(--mix-3))'];
 
-// Jadwal contoh, sama seperti kartu "Today's classes" di figcraft.
 const CLASSES = [
   { time: '06:30', name: 'Strength Foundations', coach: 'Coach Raka · Studio A', taken: 18 },
   { time: '12:00', name: 'HIIT 45', coach: 'Coach Sinta · Studio B', taken: 12 },

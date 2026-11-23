@@ -16,7 +16,7 @@ export default function Members() {
   const [form, setForm] = useState(EMPTY);
   const [errors, setErrors] = useState({});
   const [editingId, setEditingId] = useState(null);
-  const [modal, setModal] = useState(null); // 'form' | 'barcode'
+  const [modal, setModal] = useState(null);
   const [barcodeMember, setBarcodeMember] = useState(null);
 
   const rows = data.members
@@ -247,7 +247,6 @@ export default function Members() {
 
       <Modal open={modal === 'barcode'} title="Barcode anggota" onClose={() => setModal(null)}>
         {barcodeMember && (() => {
-          // Ambil data terbaru: QR berganti setiap check-in.
           const fresh = data.members.find((x) => x.id === barcodeMember.id) ?? barcodeMember;
           return (
             <div className="space-y-4 text-center">

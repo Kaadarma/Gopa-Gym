@@ -1,5 +1,3 @@
-/** @type {import('tailwindcss').Config} */
-// Warna memakai CSS variable di src/index.css, jadi berubah otomatis mengikuti tema.
 const v = (name) => `rgb(var(--${name}) / <alpha-value>)`;
 
 export default {
@@ -25,12 +23,10 @@ export default {
         hairline: 'var(--hairline)',
         line: 'var(--line)',
         lineStrong: 'var(--line-strong)',
-        // Tetap gelap di kedua tema, karena dipakai sebagai teks di atas lime.
         ink: '#0A0C06',
         pending: v('pending'),
         danger: v('danger'),
       },
-      // Nilai teks dari layer figcraft gopa-gym.figcraft (landing desktop).
       fontSize: {
         hero: ['76px', { lineHeight: '68px', letterSpacing: '-0.5px' }],
         'section-xl': ['76px', { lineHeight: '74px', letterSpacing: '-0.5px' }],

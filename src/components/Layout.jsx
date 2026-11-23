@@ -19,7 +19,6 @@ import {
   IconTransactions,
 } from './icons';
 
-// Urutan, label, ikon, dan badge mengikuti sidebar di gopa-gym.figcraft (Admin Dashboard).
 const ADMIN_NAV = [
   { key: 'dashboard', label: 'Dashboard', to: '/admin', icon: IconDashboard, section: 'Overview' },
   { key: 'members', label: 'Members', to: '/admin/members', icon: IconMembers, count: true },
@@ -60,7 +59,6 @@ export function Brand() {
   );
 }
 
-// "Monday, 16 November 2026  ·  08:42 WIB" seperti di topbar figcraft.
 function useClockLine() {
   const [line, setLine] = useState('');
   useEffect(() => {

@@ -1,4 +1,3 @@
-// Path ikon diambil langsung dari layer VECTOR di gopa-gym.figcraft (16x16, stroke 1.3).
 function Ico({ size = 16, className = '', viewBox = '0 0 16 16', children, ...rest }) {
   return (
     <svg

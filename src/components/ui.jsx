@@ -3,8 +3,6 @@ import { useEffect, useRef, useState } from 'react';
 export const inputCls =
   'w-full h-11 rounded-xl bg-secondary border border-border px-4 text-sm text-text placeholder:text-muted focus:outline-none focus:border-lime';
 
-/* Dropdown custom: options = [{ value, label }], onChange(value). Mengikuti palet tema.
-   searchable: tampilkan kolom ketik di atas daftar untuk memfilter opsi. */
 export function Select({ value, onChange, options, className = 'w-full', searchable = false }) {
   const [open, setOpen] = useState(false);
   const [active, setActive] = useState(0);
@@ -87,7 +85,6 @@ export function Select({ value, onChange, options, className = 'w-full', searcha
     <div
       ref={ref}
       className={`relative ${className}`}
-      // Mencegah label pembungkus (Field) meneruskan klik ke tombol dan membuka ulang dropdown.
       onClick={(e) => e.preventDefault()}
     >
       <button

@@ -37,7 +37,6 @@ export const nextCode = (members) => {
   return `GPA-${String(max + 1).padStart(4, '0')}`;
 };
 
-// Membership terbaru (berdasarkan tanggal berakhir) milik satu member.
 export function currentMembership(memberships, memberId) {
   return (
     memberships
@@ -46,7 +45,6 @@ export function currentMembership(memberships, memberId) {
   );
 }
 
-// 'active' | 'expired' | 'none'
 export function statusOf(memberships, memberId) {
   const cur = currentMembership(memberships, memberId);
   if (!cur) return 'none';

@@ -14,7 +14,6 @@ const LABELS = {
   access: 'Settings',
 };
 
-// Hanya Owner yang bisa membuka halaman ini (dijaga oleh Gate di App).
 export default function Access() {
   const { data, setAdminPermissions } = useStore();
   const [pages, setPages] = useState(data.permissions.admin);

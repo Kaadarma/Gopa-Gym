@@ -1,9 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { QUICK_REPLIES, reply } from '../lib/chatbot';
 
-// Mengikuti komponen figcraft "Chat / Launcher", "Chat / Panel",
-// "Chat / Bubble Bot", "Chat / Bubble User", dan "Chat / Quick Reply".
-// Ikon launcher dan avatar diekspor langsung dari figcraft (public/images).
 export default function Chatbot() {
   const [open, setOpen] = useState(false);
   const [text, setText] = useState('');
@@ -25,7 +22,6 @@ export default function Chatbot() {
 
   return (
     <>
-      {/* Chat / Launcher */}
       <button
         onClick={() => setOpen((o) => !o)}
         aria-label={open ? 'Tutup chatbot' : 'Buka chatbot'}
@@ -34,7 +30,6 @@ export default function Chatbot() {
         <img src="/images/chat-launcher.svg" alt="" className="h-full w-full" draggable="false" />
       </button>
 
-      {/* Chat / Panel */}
       <div
         className={`fixed bottom-24 right-6 z-40 flex h-[560px] max-h-[calc(100vh-7rem)] w-[380px] max-w-[calc(100vw-3rem)] origin-bottom-right flex-col overflow-hidden rounded-[14px] border border-border bg-secondary shadow-[0_24px_64px_rgba(0,0,0,0.55)] transition duration-300 ${
           open ? 'pointer-events-auto scale-100 opacity-100' : 'pointer-events-none scale-95 opacity-0'
@@ -42,7 +37,6 @@ export default function Chatbot() {
         role="dialog"
         aria-hidden={!open}
       >
-        {/* Header */}
         <div className="flex h-16 shrink-0 items-center gap-3 bg-card px-4">
           <img src="/images/chat-avatar.svg" alt="" className="h-9 w-9 shrink-0" />
           <div className="min-w-0 flex-1">
@@ -58,11 +52,9 @@ export default function Chatbot() {
           </button>
         </div>
 
-        {/* Messages */}
         <div ref={listRef} className="flex flex-1 flex-col gap-3 overflow-y-auto px-5 py-5">
           {messages.map((m, i) =>
             m.from === 'bot' ? (
-              // Chat / Bubble Bot
               <div
                 key={i}
                 className="max-w-[280px] rounded-xl bg-card px-4 py-3 text-sm leading-[1.5] text-text"
@@ -70,7 +62,6 @@ export default function Chatbot() {
                 {m.text}
               </div>
             ) : (
-              // Chat / Bubble User
               <div
                 key={i}
                 className="ml-auto max-w-[280px] rounded-xl bg-lime px-4 py-3 text-sm leading-[1.5] text-ink"
@@ -81,7 +72,6 @@ export default function Chatbot() {
           )}
         </div>
 
-        {/* Chat / Quick Reply */}
         <div className="flex flex-wrap gap-2 px-5 pb-3">
           {QUICK_REPLIES.map((q) => (
             <button
@@ -94,7 +84,6 @@ export default function Chatbot() {
           ))}
         </div>
 
-        {/* Composer */}
         <form
           onSubmit={(e) => {
             e.preventDefault();

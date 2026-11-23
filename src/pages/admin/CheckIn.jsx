@@ -27,12 +27,9 @@ export default function CheckIn() {
     return res;
   };
 
-  // Callback scanner dibuat sekali per aktivasi kamera, jadi selalu memanggil versi run terbaru.
   const runRef = useRef(run);
   runRef.current = run;
 
-  // Kamera: hanya aktif saat cameraOn. Tiap effect membuat host element sendiri,
-  // supaya start/stop dari React StrictMode (yang menjalankan effect dua kali) tidak bertabrakan.
   useEffect(() => {
     if (!cameraOn) return undefined;
     const container = containerRef.current;
@@ -57,13 +54,11 @@ export default function CheckIn() {
         { facingMode: 'environment' },
         { fps: 10, qrbox: { width: 220, height: 220 } },
         (decoded) => {
-          // Cegah kode yang sama terbaca berulang dalam 3 detik.
           const now = Date.now();
           const last = lastScanRef.current;
           if (decoded === last.value && now - last.at < 3000) return;
           lastScanRef.current = { value: decoded, at: now };
           const res = runRef.current(decoded);
-          // Check-in berhasil: kamera mati otomatis.
           if (res?.ok) setCameraOn(false);
         },
         () => {},
@@ -89,12 +84,10 @@ export default function CheckIn() {
           try {
             scanner.clear();
           } catch {
-            // host sudah tidak ada
           }
           host.remove();
         });
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [cameraOn]);
 
   const t = today();

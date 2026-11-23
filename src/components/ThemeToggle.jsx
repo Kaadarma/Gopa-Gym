@@ -1,6 +1,5 @@
 import { useTheme } from '../lib/theme';
 
-// Tombol ganti tema. Ikon matahari saat dark (ganti ke light), bulan saat light.
 export default function ThemeToggle({ className = '' }) {
   const { theme, toggle } = useTheme();
   const isDark = theme === 'dark';

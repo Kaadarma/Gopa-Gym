@@ -22,13 +22,12 @@ for (const file of files) {
     continue;
   }
   text.split(/\r?\n/).forEach((line, i) => {
-    // Komentar dan pesan teks (ada spasi) bukan kredensial.
     if (/^\s*(\/\/|\/\*|\*)/.test(line)) return;
     const m = assignRe.exec(line);
     if (!m) return;
     const value = m[2] || m[3];
     if (/\s/.test(value)) return;
-    if (/^[\w$.]+\(/.test(value)) return; // pemanggilan fungsi, mis. newQrToken()
+    if (/^[\w$.]+\(/.test(value)) return;
     if (placeholderRe.test(value)) return;
     hits.push(`${file}:${i + 1}: ${line.trim()}`);
   });

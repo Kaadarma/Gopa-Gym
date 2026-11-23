@@ -20,11 +20,9 @@ const ADMIN_DEFAULT = ['dashboard', 'members', 'packages', 'memberships', 'check
 
 export const homeFor = (role) => (role === 'member' ? '/member' : '/admin');
 
-// Token QR sekali pakai: berganti setiap check-in berhasil.
 export const newQrToken = () =>
   Array.from({ length: 8 }, () => 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'[Math.floor(Math.random() * 32)]).join('');
 
-// Isi QR anggota: "KODE|TOKEN". Kode saja tetap bisa dipakai untuk input manual.
 export const qrValueOf = (m) => (m?.qrToken ? `${m.code}|${m.qrToken}` : m?.code ?? '');
 
 function seed() {
@@ -34,7 +32,6 @@ function seed() {
     { id: 2, name: 'Standard', price: 300000, durationDays: 90 },
     { id: 3, name: 'Premium', price: 550000, durationDays: 180 },
   ];
-  // [kode, nama, telepon, offset mulai (hari), id paket]
   const rows = [
     ['GPA-0001', 'Arif Rahman', '0812-1000-0001', -10, 1],
     ['GPA-0002', 'Sinta Dewi', '0812-1000-0002', -30, 2],
@@ -111,7 +108,6 @@ function load(key) {
 const StoreCtx = createContext(null);
 
 export function StoreProvider({ children }) {
-  // Akun owner sudah dihapus: buang juga dari data tersimpan dan sesi lama.
   const [data, setData] = useState(() => {
     const d = load(DATA_KEY) || seed();
     return {
@@ -165,8 +161,6 @@ export function StoreProvider({ children }) {
         patch('permissions', (p) => ({ ...p, admin: pages }));
       },
 
-      // Simpan anggota dan akun login-nya sekaligus. Email anggota adalah username login.
-      // form.password: wajib untuk anggota baru; saat edit, kosong berarti tidak diubah.
       saveMember(form) {
         const { password, ...member } = form;
         const email = (member.email || '').trim().toLowerCase();
@@ -230,7 +224,6 @@ export function StoreProvider({ children }) {
         patch('packages', (list) => list.filter((p) => p.id !== id));
       },
 
-      // Aktivasi baru, atau perpanjangan jika membership sebelumnya masih berlaku.
       activateMembership({ memberId, packageId, start, payment }) {
         const pkg = data.packages.find((p) => p.id === Number(packageId));
         if (!pkg) return { ok: false, msg: 'Paket tidak ditemukan.' };
@@ -279,12 +272,10 @@ export function StoreProvider({ children }) {
         patch('attendance', (list) => list.filter((a) => a.id !== id));
       },
 
-      // Validasi check-in: kode dikenal, membership aktif, dan belum check-in hari ini.
       checkIn(raw) {
         const [code, token] = raw.trim().toUpperCase().split('|');
         const m = data.members.find((x) => x.code === code);
         if (!m) return { ok: false, msg: `QR Code "${code}" tidak dikenal.` };
-        // QR yang berisi token harus cocok dengan token terbaru anggota (QR lama tidak berlaku).
         if (token !== undefined && token !== m.qrToken) {
           return { ok: false, msg: `QR ${m.name} sudah tidak berlaku. Minta anggota menampilkan QR terbaru.` };
         }
@@ -298,7 +289,6 @@ export function StoreProvider({ children }) {
         if (data.attendance.some((a) => a.memberId === m.id && a.date === today())) {
           return { ok: false, msg: `${m.name} sudah check-in hari ini.` };
         }
-        // Check-in berhasil: catat kehadiran dan ganti token QR anggota.
         setData((d) => ({
           ...d,
           attendance: [

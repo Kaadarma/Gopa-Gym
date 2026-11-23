@@ -1,4 +1,3 @@
-// Chatbot berbasis aturan (keyword). Pertanyaan di luar cakupan dijawab dengan fallback.
 import { config } from './config';
 const INTENTS = [
   {

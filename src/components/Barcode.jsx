@@ -1,7 +1,5 @@
 ﻿import { QRCodeSVG } from 'qrcode.react';
 
-// QR code kotak. "value" adalah isi QR, "label" (opsional) teks yang tampil di bawahnya.
-// "height" dipakai sebagai ukuran sisi QR (px).
 export default function Barcode({ value, label, height = 90 }) {
   if (!value) return null;
   return (

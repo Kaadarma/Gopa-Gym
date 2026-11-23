@@ -6,7 +6,6 @@ export default function Analytics() {
   const { data } = useStore();
   const t = today();
 
-  // Pendapatan 6 bulan terakhir
   const base = new Date();
   base.setDate(1);
   const months = Array.from({ length: 6 }, (_, i) => {
@@ -17,7 +16,6 @@ export default function Analytics() {
   });
   const maxRevenue = Math.max(1, ...months.map((m) => m.value));
 
-  // Check-in 7 hari terakhir
   const days = Array.from({ length: 7 }, (_, i) => {
     const date = addDays(t, i - 6);
     const label = new Date(`${date}T00:00:00`).toLocaleDateString('id-ID', { weekday: 'short' });
@@ -25,7 +23,6 @@ export default function Analytics() {
   });
   const maxCheckin = Math.max(1, ...days.map((d) => d.value));
 
-  // Status membership
   const statusCount = { active: 0, expired: 0, none: 0 };
   data.members.forEach((m) => {
     const list = data.memberships.filter((x) => x.memberId === m.id);
@@ -35,12 +32,10 @@ export default function Analytics() {
   });
   const totalMembers = data.members.length || 1;
 
-  // Paket terlaris
   const pkgSales = data.packages
     .map((p) => ({ name: p.name, count: data.memberships.filter((x) => x.packageId === p.id).length }))
     .sort((a, b) => b.count - a.count);
 
-  // Tingkat perpanjangan: anggota yang punya >1 membership
   const withAny = data.members.filter((m) => data.memberships.some((x) => x.memberId === m.id)).length;
   const renewed = data.members.filter((m) => data.memberships.filter((x) => x.memberId === m.id).length > 1).length;
   const renewalRate = withAny ? Math.round((renewed / withAny) * 100) : 0;

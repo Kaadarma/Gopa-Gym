@@ -16,7 +16,6 @@ import Access from './pages/admin/Access';
 import MemberHome from './pages/member/Home';
 import MemberBarcode from './pages/member/BarcodePage';
 
-// Hanya peran yang diizinkan yang boleh masuk.
 function Guard({ roles, children }) {
   const { session } = useStore();
   if (!session) return <Navigate to="/login" replace />;
@@ -24,7 +23,6 @@ function Guard({ roles, children }) {
   return children;
 }
 
-// Hak akses per halaman (Admin bisa diatur Owner, Owner selalu penuh).
 function Gate({ page, children }) {
   const { can } = useStore();
   if (!can(page)) {
