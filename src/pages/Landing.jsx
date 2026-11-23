@@ -127,19 +127,19 @@ export default function Landing() {
           <Brand />
           <nav className="hidden items-center gap-7 lg:flex">
             {NAV.map(([label, href]) => (
-              <a key={label} href={href} className="micro transition hover:!text-lime">
+              <a key={label} href={href} className="font-sans text-[11px] font-semibold uppercase tracking-[1.2px] text-text transition hover:!text-lime">
                 {label}
               </a>
             ))}
           </nav>
           <div className="flex items-center gap-3">
             <ThemeToggle />
-            <Link to="/login" className="micro hidden transition hover:!text-lime sm:block">
+            <Link to="/login" className="hidden font-sans text-[11px] font-semibold uppercase tracking-[1.2px] text-text transition hover:!text-lime sm:block">
               Login
             </Link>
             <Link
               to="/login"
-              className="inline-flex h-10 items-center rounded-full bg-lime px-5 text-xs font-semibold uppercase tracking-wider text-ink transition hover:-translate-y-0.5 hover:bg-limeBright"
+              className="inline-flex h-10 items-center rounded-full bg-lime px-6 font-condensed text-[13px] font-bold uppercase tracking-[1.2px] text-ink transition hover:-translate-y-0.5 hover:bg-limeBright"
             >
               Get started
             </Link>
