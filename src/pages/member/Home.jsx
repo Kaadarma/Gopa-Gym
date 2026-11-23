@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom';
 import { useStore } from '../../lib/store';
-import { currentMembership, daysBetween, fmtDate, fmtRp, statusOf, today } from '../../lib/utils';
+import { currentMembership, daysBetween, downloadCsv, fmtDate, fmtRp, statusOf, today } from '../../lib/utils';
 import { Avatar, Badge, Button, Card, PageHeader, TD, TH } from '../../components/ui';
 
 export default function MemberHome() {
@@ -18,6 +18,21 @@ export default function MemberHome() {
   const history = data.memberships
     .filter((m) => m.memberId === member.id)
     .sort((a, b) => b.start.localeCompare(a.start));
+
+  const paymentOf = (h) =>
+    data.transactions.find((x) => x.memberId === member.id && x.date === h.start);
+
+  const exportHistory = () => {
+    const rows = [
+      ['Jenis', 'Paket', 'Mulai', 'Berakhir', 'Pembayaran'],
+      ...history.map((h) => {
+        const p = data.packages.find((x) => x.id === h.packageId);
+        const pay = paymentOf(h);
+        return [h.type, p?.name ?? '-', h.start, h.end, pay ? pay.amount : ''];
+      }),
+    ];
+    downloadCsv(`riwayat-membership-${member.code}-${t}.csv`, rows);
+  };
 
   return (
     <>
@@ -70,8 +85,11 @@ export default function MemberHome() {
       </div>
 
       <Card className="mt-4 p-0">
-        <div className="border-b border-border px-6 py-4">
+        <div className="flex items-center justify-between gap-4 border-b border-border px-6 py-4">
           <p className="micro">Riwayat membership</p>
+          <Button variant="secondary" className="h-9 px-4 text-xs" onClick={exportHistory}>
+            Ekspor CSV
+          </Button>
         </div>
         <div className="overflow-x-auto">
           <table className="w-full">

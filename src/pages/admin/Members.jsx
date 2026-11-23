@@ -1,13 +1,14 @@
 import { useState } from 'react';
 import { qrValueOf, useStore } from '../../lib/store';
 import { config } from '../../lib/config';
-import { currentMembership, fmtDate, statusOf } from '../../lib/utils';
+import { currentMembership, downloadCsv, fmtDate, statusOf, today } from '../../lib/utils';
 import { Avatar, Badge, Button, Card, Field, Modal, Notice, Select, TD, TH, inputCls } from '../../components/ui';
 import Barcode from '../../components/Barcode';
 
 const EMPTY = { name: '', phone: '', email: '', password: '', photo: null };
 const PHOTO_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
 const MAX_PHOTO_BYTES = config.maxPhotoKb * 1024;
+const STATUS_LABEL = { active: 'Aktif', expired: 'Kedaluwarsa', none: 'Belum ada membership' };
 
 export default function Members() {
   const { data, saveMember, deleteMember } = useStore();
@@ -34,6 +35,19 @@ export default function Members() {
       const matchText = !term || [m.name, m.code, m.phone].some((v) => v.toLowerCase().includes(term));
       return matchText && (filter === 'all' || status === filter);
     });
+
+  const exportMembers = () => {
+    const header = ['Anggota', 'ID', 'Telepon', 'Paket', 'Status', 'Berakhir'];
+    const body = rows.map(({ m, cur, status, pkg }) => [
+      m.name,
+      m.code,
+      m.phone,
+      pkg?.name ?? '-',
+      STATUS_LABEL[status],
+      cur ? cur.end : '',
+    ]);
+    downloadCsv(`anggota-${today()}.csv`, [header, ...body]);
+  };
 
   const openNew = () => {
     setEditingId(null);
@@ -109,7 +123,10 @@ export default function Members() {
 
   return (
     <>
-      <div className="mb-4 flex justify-end">
+      <div className="mb-4 flex justify-end gap-3">
+        <Button variant="secondary" onClick={exportMembers}>
+          Ekspor CSV
+        </Button>
         <Button onClick={openNew}>+ Tambah anggota</Button>
       </div>
 

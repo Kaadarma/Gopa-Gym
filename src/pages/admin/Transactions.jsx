@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useStore } from '../../lib/store';
-import { fmtDate, fmtRp, today } from '../../lib/utils';
+import { downloadCsv, fmtDate, fmtRp, today } from '../../lib/utils';
 import { Button, Card, Field, Select, TD, TH, inputCls } from '../../components/ui';
 
 const METHODS = ['Tunai', 'Transfer', 'QRIS', 'Debit'];
@@ -42,6 +42,12 @@ export default function Transactions() {
   const memberName = (id) => data.members.find((m) => m.id === id)?.name ?? '-';
   const rows = [...data.transactions].sort((a, b) => b.date.localeCompare(a.date));
   const total = rows.reduce((s, x) => s + x.amount, 0);
+
+  const exportTransactions = () => {
+    const header = ['Tanggal', 'Anggota', 'Catatan', 'Metode', 'Nominal'];
+    const body = rows.map((t) => [t.date, memberName(t.memberId), t.note || '', t.method, t.amount]);
+    downloadCsv(`transaksi-${today()}.csv`, [header, ...body]);
+  };
 
   return (
     <>
@@ -86,11 +92,16 @@ export default function Transactions() {
         </Card>
 
         <Card className="overflow-hidden p-0 lg:col-span-3">
-          <div className="flex items-center justify-between px-6 pt-6">
+          <div className="flex items-center justify-between gap-4 px-6 pt-6">
             <p className="micro">Riwayat pembayaran</p>
-            <p className="text-sm text-muted">
-              Total: <span className="font-semibold text-lime">{fmtRp(total)}</span>
-            </p>
+            <div className="flex items-center gap-4">
+              <p className="text-sm text-muted">
+                Total: <span className="font-semibold text-lime">{fmtRp(total)}</span>
+              </p>
+              <Button variant="secondary" className="h-9 px-4 text-xs" onClick={exportTransactions}>
+                Ekspor CSV
+              </Button>
+            </div>
           </div>
           <div className="mt-4 overflow-x-auto">
             <table className="w-full">
