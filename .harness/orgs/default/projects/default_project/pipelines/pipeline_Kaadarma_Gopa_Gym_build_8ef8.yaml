@@ -1,0 +1,35 @@
+pipeline:
+  id: pipeline_Kaadarma_Gopa_Gym_build_8ef8
+  name: pipeline_Kaadarma_Gopa_Gym_build_8ef8
+  stages:
+    - name: Build
+      id: build
+      runtime: cloud
+      platform:
+        os: linux
+        arch: amd64
+      clone:
+        enabled: true
+      cache:
+        enabled: true
+      steps:
+        - name: Install Dependencies
+          id: install_dependencies
+          run:
+            shell: bash
+            script: |-
+              export CI=true
+              curl -fsSL https://nodejs.org/dist/v20.18.0/node-v20.18.0-linux-x64.tar.xz | tar -xJ -C /opt
+              export PATH="/opt/node-v20.18.0-linux-x64/bin:$PATH"
+              node --version
+              npm ci
+        - name: Build
+          id: build_step
+          run:
+            shell: bash
+            script: |-
+              export CI=true
+              export PATH="/opt/node-v20.18.0-linux-x64/bin:$PATH"
+              npm run build
+  tags:
+    onboarding: "true"
